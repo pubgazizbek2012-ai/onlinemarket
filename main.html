@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NextStore | Zamonaviy Onlayn Market</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --accent: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
+
+        /* Navigation Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo span { color: var(--text-main); }
+
+        .search-bar {
+            flex: 1;
+            max-width: 450px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text-main);
+            font-size: 14px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .search-bar input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+
+        .cart-icon-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            transition: 0.3s;
+        }
+
+        .cart-icon-btn:hover {
+            border-color: var(--primary);
+        }
+
+        .cart-badge {
+            background: var(--primary);
+            color: white;
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 20px;
+        }
+
+        /* Layout Main */
+        main {
+            padding: 30px 8%;
+        }
+
+        /* Filter Categories */
+        .categories {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .cat-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            white-space: nowrap;
+            transition: 0.3s;
+        }
+
+        .cat-btn.active, .cat-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Products Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 25px;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .product-img {
+            width: 100%;
+            height: 180px;
+            object-fit: contain;
+            background: #fff;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            padding: 10px;
+        }
+
+        .product-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .product-rating {
+            color: var(--accent);
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .product-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .product-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #38bdf8;
+        }
+
+        .add-cart-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .add-cart-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        /* Cart Drawer (Side Modal) */
+        .cart-drawer {
+            position: fixed;
+            top: 0;
+            right: -420px;
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
+            background: var(--card-bg);
+            border-left: 1px solid var(--border);
+            z-index: 200;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-drawer.open {
+            right: 0;
+        }
+
+        .cart-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-cart {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255,255,255,0.03);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .cart-item img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            background: #fff;
+            border-radius: 4px;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-title {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .cart-item-price {
+            font-size: 13px;
+            color: #38bdf8;
+            margin-top: 4px;
+        }
+
+        .qty-btn {
+            background: var(--border);
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .cart-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border);
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .checkout-btn:hover {
+            background: #059669;
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.6);
+            z-index: 150;
+            display: none;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .search-bar { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <a href="#" class="logo">Next<span>Store</span></a>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Mahsulotlarni qidirish..." oninput="filterProducts()">
+        </div>
+        <button class="cart-icon-btn" onclick="toggleCart()">
+            🛒 Savatcha <span class="cart-badge" id="cartCount">0</span>
+        </button>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Categories -->
+        <div class="categories">
+            <button class="cat-btn active" onclick="filterCategory('all', this)">Barchasi</button>
+            <button class="cat-btn" onclick="filterCategory('elektronika', this)">Elektronika</button>
+            <button class="cat-btn" onclick="filterCategory('kiyim', this)">Kiyim-kechak</button>
+            <button class="cat-btn" onclick="filterCategory('aksessuar', this)">Aksessuarlar</button>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="products-grid" id="productsGrid">
+            <!-- Products loaded via JS -->
+        </div>
+    </main>
+
+    <!-- Cart Drawer -->
+    <div class="cart-drawer" id="cartDrawer">
+        <div class="cart-header">
+            <h3>Sizning Savatchangiz</h3>
+            <button class="close-cart" onclick="toggleCart()">&times;</button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <!-- Cart items loaded via JS -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Jami:</span>
+                <span id="cartTotalSum">$0</span>
+            </div>
+            <button class="checkout-btn" onclick="checkout()">Buyurtma berish</button>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay" onclick="toggleCart()"></div>
+
+    <script>
+        // Mahsulotlar Ma'lumotlar Bazasi
+        const products = [
+            { id: 1, name: "Wireless Headphones", category: "elektronika", price: 99, rating: "★★★★☆", img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300" },
+            { id: 2, name: "Smartwatch Series 7", category: "elektronika", price: 199, rating: "★★★★★", img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300" },
+            { id: 3, name: "Klassik Erkaklar Kurtkasi", category: "kiyim", price: 79, rating: "★★★★☆", img: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=300" },
+            { id: 4, name: "Noutbuk uchun Ryukzak", category: "aksessuar", price: 45, rating: "★★★★☆", img: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300" },
+            { id: 5, name: "Gaming Sichqoncha RGB", category: "elektronika", price: 35, rating: "★★★★★", img: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=300" },
+            { id: 6, name: "Krossovka Sportivny", category: "kiyim", price: 89, rating: "★★★★☆", img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300" }
+        ];
+
+        let cart = [];
+        let currentCategory = 'all';
+
+        // Mahsulotlarni Ekranga Chiqarish
+        function renderProducts(items) {
+            const grid = document.getElementById("productsGrid");
+            grid.innerHTML = "";
+
+            if (items.length === 0) {
+                grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Mahsulot topilmadi.</p>`;
+                return;
+            }
+
+            items.forEach(p => {
+                grid.innerHTML += `
+                    <div class="product-card">
+                        <img src="${p.img}" alt="${p.name}" class="product-img">
+                        <div>
+                            <div class="product-title">${p.name}</div>
+                            <div class="product-rating">${p.rating}</div>
+                        </div>
+                        <div class="product-bottom">
+                            <div class="product-price">$${p.price}</div>
+                            <button class="add-cart-btn" onclick="addToCart(${p.id})">Qo'shish</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Qidiruv va Filtr
+        function filterProducts() {
+            const query = document.getElementById("searchInput").value.toLowerCase();
+            const filtered = products.filter(p => {
+                const matchesCat = currentCategory === 'all' || p.category === currentCategory;
+                const matchesSearch = p.name.toLowerCase().includes(query);
+                return matchesCat && matchesSearch;
+            });
+            renderProducts(filtered);
+        }
+
+        function filterCategory(cat, btn) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            filterProducts();
+        }
+
+        // Savatcha Boshqaruvi
+        function addToCart(id) {
+            const product = products.find(p => p.id === id);
+            const existItem = cart.find(item => item.id === id);
+
+            if (existItem) {
+                existItem.qty++;
+            } else {
+                cart.push({ ...product, qty: 1 });
+            }
+            updateCartUI();
+        }
+
+        function changeQty(id, delta) {
+            const item = cart.find(i => i.id === id);
+            if (item) {
+                item.qty += delta;
+                if (item.qty <= 0) {
+                    cart = cart.filter(i => i.id !== id);
+                }
+            }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const cartItemsEl = document.getElementById("cartItems");
+            const cartCountEl = document.getElementById("cartCount");
+            const cartTotalSumEl = document.getElementById("cartTotalSum");
+
+            cartItemsEl.innerHTML = "";
+            let totalQty = 0;
+            let totalPrice = 0;
+
+            cart.forEach(item => {
+                totalQty += item.qty;
+                totalPrice += item.price * item.qty;
+
+                cartItemsEl.innerHTML += `
+                    <div class="cart-item">
+                        <img src="${item.img}" alt="${item.name}">
+                        <div class="cart-item-info">
+                            <div class="cart-item-title">${item.name}</div>
+                            <div class="cart-item-price">$${item.price} x ${item.qty}</div>
+                        </div>
+                        <div style="display: flex; gap: 5px; align-items: center;">
+                            <button class="qty-btn" onclick="changeQty(${item.id}, -1)">-</button>
+                            <span>${item.qty}</span>
+                            <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            cartCountEl.innerText = totalQty;
+            cartTotalSumEl.innerText = "$" + totalPrice;
+        }
+
+        function toggleCart() {
+            document.getElementById("cartDrawer").classList.toggle("open");
+            document.getElementById("overlay").classList.toggle("active");
+        }
+
+        function checkout() {
+            if (cart.length === 0) {
+                alert("Savatchangiz bo'sh!");
+                return;
+            }
+            alert("Xaridingiz uchun rahmat! Buyurtmangiz qabul qilindi.");
+            cart = [];
+            updateCartUI();
+            toggleCart();
+        }
+
+        // Boshlang'ich Yuklash
+        renderProducts(products);
+    </script>
+</body>
+</html>
